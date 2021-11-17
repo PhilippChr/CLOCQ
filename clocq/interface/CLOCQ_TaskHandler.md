@@ -1,5 +1,5 @@
 ## TaskHandler
-The TaskHandler was primarily designed to handle any incoming requests on the (website)[clocq.mpi-inf.mpg.de].
+The TaskHandler was primarily designed to handle any incoming requests on the [website](clocq.mpi-inf.mpg.de).
 However, it could also be used internally. The possible functions are exactly the same as for the [CLOCQ class](../CLOCQ.py).
 It works as follows:
 each usage of CLOCQ is given as a task. A task is represented as a json-object, and consists of the task-name and the parameters.
@@ -21,8 +21,8 @@ An example usage can be found below:
 
 
 ### Tasks
-Example list of tasks that is given to the CLOCQTaskHandler. For each possible task, there is one example, with the excpected input. Optional parameters are shown as such. In case a mandatory argument is missing, the CLOCQTaskHandler will skip the corresponding task!
-A runnable version of these example tasks is given [here](tests/tasks_example.json).
+Example list of tasks that is given to the [CLOCQTaskHandler](CLOCQTaskHandler.py). For each possible task, there is one example, with the excpected input. Optional parameters are shown as such. In case a mandatory argument is missing (or some other problem occurs), the CLOCQTaskHandler will write an empty line for the task into the result file.
+A runnable version (without comments) of the following example tasks is given [here](tests/tasks_example.json).
 
 	[	
 		// GET LABEL OF KB ITEM

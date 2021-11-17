@@ -22,12 +22,15 @@ class CLOCQTaskHandler:
 		"""
 		Process the given task and write the output into the file.
 		"""
-		method = getattr(self.clocq, task["task"])
-		args = {key: task[key] for key in task if not key == "task"}
-		res = method(**args)
-		output_file.write(json.dumps(res))
-		output_file.write("\n")
-
+		try:
+			function = getattr(self.clocq, task["task"])
+			args = {key: task[key] for key in task if not key == "task"}
+			res = function(**args)
+			output_file.write(json.dumps(res))
+			output_file.write("\n")
+		except:
+			# make sure to write something to the file
+			output_file.write("\n")
 
 """
 MAIN
