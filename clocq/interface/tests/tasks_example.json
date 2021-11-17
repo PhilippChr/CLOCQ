@@ -1,0 +1,54 @@
+[	
+	{
+		"task": "get_label",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_labels",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_aliases",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_description",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_types",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_frequency",
+		"kb_item": "Q31043671"
+	},
+	{
+		"task": "get_neighborhood",
+		"kb_item": "Q31043671",
+		"p": 1000,
+		"include_labels": true 
+	},
+	{
+		"task": "get_neighborhood_two_hop",
+		"kb_item": "Q31043671",
+		"p": 1000,
+		"include_labels": true 
+	},
+	{
+		"task": "connect",
+		"kb_item1": "Q31043671",
+		"kb_item2": "Q47774"
+	},
+	{
+		"task": "connect",
+		"kb_item1": "Q31043671",
+		"kb_item2": "Q47774"
+	},
+	{
+		"task": "get_search_space",
+		"question": "Who played Arya in Game of Thrones?",
+		"parameters": {"p": 1000}, 
+		"include_labels": true
+	}
+]

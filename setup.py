@@ -1,0 +1,30 @@
+from setuptools import find_packages, setup
+
+setup(
+    name="clocq",
+    version="1.0",
+    description='Code for the 2022 WSDM paper "Beyond NED: Fast and Effective Search Space Reduction for Complex Question Answering over Knowledge Bases".',
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    author="Philipp Christmann",
+    author_email="pchristm@mpi-inf.mpg.de",
+    url="https://clocq.mpi-inf.mpg.de",
+    packages=find_packages(),
+    include_package_data=True,
+    keywords=["clocq", "kb", "knowledge base", "qa", "question answering"],
+    classifiers=["Programming Language :: Python :: 3.8",],
+    install_requires=[
+        "Flask",
+        "hdt",
+        "networkx",
+        "numpy",
+        "pybind11",
+        "rank_bm25",
+        "requests",
+        "scipy",
+        "spacy",
+        "stanza",
+        "tqdm",
+        "wikipedia2vec",
+    ],
+)

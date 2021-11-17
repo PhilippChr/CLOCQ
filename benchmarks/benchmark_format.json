@@ -1,0 +1,26 @@
+{   
+    "dev": [
+        {   
+            "question": "Who played Arya in Game of Thrones?",
+            "answers": [
+                "Q234363"
+            ],
+            "any": ["other", "key"]
+        },
+        {
+            "question": "Creator of Game of Thrones?",
+            "answers": [
+                "Q1151388",
+                "Q503997"
+            ]
+        }
+    ],
+    "test": [
+        {
+            "question": "What year was the Wizard of Oz released?", 
+            "answers": [
+                "1939"
+            ]
+        }
+    ]
+}

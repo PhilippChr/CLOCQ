@@ -1,0 +1,9 @@
+results/*
+*.out
+*/__pycache__
+__pycache__
+*.DS_Store
+knowledge_base/KnowledgeBaseLowMem.py
+*.kb
+clocq.egg-info/
+data/
