@@ -39,7 +39,7 @@ def _test(clocq):
     res = clocq.connectivity_check(kb_item1, kb_item2)
     print(res)
 
-    ques = "who scored a goal in 2018 final between France and Croatia?"
+    ques = "who scored in the 2018 final between France and Croatia?"
     res = clocq.get_search_space(ques)
     print(res.keys())
     items = [item["item"] for item in res["kb_item_tuple"]]

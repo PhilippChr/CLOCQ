@@ -142,7 +142,7 @@ class CLOCQ:
         else:
             new_parameters = config.DEF_PARAMS
             for key in parameters:
-                new_parameters = parameters[key]
+                new_parameters[key] = parameters[key]
             parameters = new_parameters
         return self.clocq.get_seach_space(question, parameters=parameters, include_labels=include_labels)
 

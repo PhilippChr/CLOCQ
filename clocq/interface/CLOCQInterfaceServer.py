@@ -173,7 +173,7 @@ def search_space():
     else:
         new_parameters = config.DEF_PARAMS
         for key in parameters:
-            new_parameters = parameters[key]
+            new_parameters[key] = parameters[key]
         parameters = new_parameters
     # include labels of search space?
     include_labels = json_dict.get("include_labels")
