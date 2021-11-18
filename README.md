@@ -80,7 +80,20 @@ You can pass a benchmark in [this format](benchmarks/benchmark_format.md) to the
 
 2. **Dynamic usage of CLOCQ - within a single script**:  
 If your data is dynamic (e.g. in a realistic setup in which users can pose arbitrary questions at run-time), there is another possibility of using CLOCQ:
-you can simply include the [CLOCQ](clocq/CLOCQ.py) class in your python scripts and make use of the provided functions. Note: each instance of the CLOCQInterface will load the whole KB. So make sure to create new instances only if really needed, and pass the reference otherwise. 
+you can simply include the [CLOCQ](clocq/CLOCQ.py) class in your python scripts and make use of the provided functions. Note: each instance of the CLOCQInterface will load the whole KB. So make sure to create new instances only if really needed, and pass the reference otherwise. See [the CLOCQ class](clocq/CLOCQ.py) for an overview of all available functions. Example:
+
+```python
+    from clocq import CLOCQ
+    
+    TAGME_TOKEN = "<INSERT YOUR TOKEN HERE>"
+    cl = CLOCQ(tagme_token=TAGME_TOKEN)
+    
+    res = cl.get_label("Q5")
+    print(res)
+    
+    res = cl.get_search_space("who was the screenwriter for Crazy Rich Asians?")
+    print(res.keys())
+```
 
 3. **Dynamic usage of CLOCQ - within a machine**:  
 If multiple scripts require to access the CLOCQ code, a Server-Client setup is recommended. You can start an instance of the [CLOCQInterfaceServer](clocq/interface/CLOCQInterfaceServer.py) at an appropriate port on your localhost (or any other host). Once the server is started, multiple scripts can access CLOCQ in parallel using an instance of the [CLOCQInterfaceClient](clocq/interface/CLOCQInterfaceClient.py) class. [More details](clocq/interface/CLOCQ_Server.md)
