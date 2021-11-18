@@ -100,12 +100,14 @@ class StringLibrary:
         elif ner == "stanza":
             return self.stanza_NER(question, nlp)
 
-    def tagme_NER(self, question):
+    def tagme_NER(self, question, recursion_depth=0):
         """
         Apply the TagME NER method on the question.
         Returns all detected entity mentions.
         """
         # check whether result is there in cache
+        if recursion_depth == 5:
+            return []
         if self.tagme_NER_cache.get(question):
             return self.tagme_NER_cache[question]
         try:
@@ -121,7 +123,7 @@ class StringLibrary:
             return entity_spots
         except:
             time.sleep(1)
-            return self.tagme_NER(question)
+            return self.tagme_NER(question, recursion_depth=recursion_depth+1)
 
     def spacy_NER(self, question, spacy_nlp):
         """
@@ -143,11 +145,13 @@ class StringLibrary:
         entities = [entity.text for entity in doc.ents]
         return entities
 
-    def tagme_NED(self, question):
+    def tagme_NED(self, question, recursion_depth=0):
         """
         Apply the TagME NED method on the question.
         Returns all entities (Wikipedia links).
         """
+        if recursion_depth == 5:
+            return []
         try:
             results = self.request_session.get(
                 "https://tagme.d4science.org/tagme/tag?lang=en&gcube-token=" + self.tagme_token + "&text=" + question
@@ -159,7 +163,7 @@ class StringLibrary:
             return entities
         except:
             time.sleep(1)
-            return self.tagme_NED(question)
+            return self.tagme_NED(question, recursion_depth=recursion_depth+1)
 
     def convert_month_to_number(self, month):
         """Map the given month to a number."""

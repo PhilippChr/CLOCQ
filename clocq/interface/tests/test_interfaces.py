@@ -4,8 +4,8 @@ from clocq.CLOCQ import CLOCQ
 from clocq.interface.CLOCQInterfaceClient import CLOCQInterfaceClient
 from clocq.interface.CLOCQTaskHandler import CLOCQTaskHandler
 
-def test(clocq):
-    kb_item = "Q5"
+def _test(clocq):
+    kb_item = "Q47774"
 
     res = clocq.get_label(kb_item)
     print(res)
@@ -26,10 +26,10 @@ def test(clocq):
     print(res)
 
     res = clocq.get_neighborhood(kb_item)
-    print(res)
+    print(len(res))
 
     res = clocq.get_neighborhood_two_hop(kb_item)
-    print(res)
+    print(len(res))
 
     kb_item1 = kb_item
     kb_item2 = "Q215627"
@@ -42,6 +42,8 @@ def test(clocq):
     ques = "who scored a goal in 2018 final between France and Croatia?"
     res = clocq.get_search_space(ques)
     print(res.keys())
+    items = [item["item"] for item in res["kb_item_tuple"]]
+    print(items)
 
     res = clocq.is_wikidata_entity(kb_item)
     print(res)
@@ -52,12 +54,12 @@ def test(clocq):
 
 if __name__ == "__main__":
     # clocq = CLOCQ(dev=True)
-    # test(clocq)
+    # _test(clocq)
 
-    # clocq = CLOCQInterfaceClient(port="7778")
-    # test(clocq)
+    clocq = CLOCQInterfaceClient(port="7778")
+    _test(clocq)
 
-    task_handler = CLOCQTaskHandler(dev=True)
-    input_path = "clocq/interface/tasks_example.json"
-    output_path = "clocq/interface/tasks_example.jsonl"
-    task_handler.process_tasks(input_path, output_path)
+    # task_handler = CLOCQTaskHandler(dev=True)
+    # input_path = "clocq/interface/tasks_example.json"
+    # output_path = "clocq/interface/tasks_example.jsonl"
+    # task_handler.process_tasks(input_path, output_path)

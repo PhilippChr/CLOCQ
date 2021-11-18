@@ -158,7 +158,7 @@ if __name__ == "__main__":
         kb_name = "clocq"
         kb = KnowledgeBase(config.PATH_TO_KB_LIST, config.PATH_TO_KB_DICTS)
 
-    method_name = "results/clocq500d_" + data_split + "_" + kb_name
+    method_name = "results/clocq_" + data_split + "_" + kb_name
     clocq = CLOCQAlgorithm(
         kb,
         string_lib,

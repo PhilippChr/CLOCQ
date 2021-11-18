@@ -87,12 +87,12 @@ You can add a new benchmark tuple to the [config](clocq/config.py), and run the 
     # ...
 ```
 
-```bash
+```python
     # Evaluate + store results (on test set)
     nohup python clocq/Inference.py --test --store &
 ```
 
-```bash
+```python
     # Evaluate + store results (on dev set)
     nohup python clocq/Inference.py --dev --store &
 ```
