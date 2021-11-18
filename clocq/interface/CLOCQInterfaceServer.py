@@ -14,7 +14,7 @@ from clocq.StringLibrary import StringLibrary
 from clocq.WikidataSearchCache import WikidataSearchCache
 
 """Flask config"""
-app = Flask(__name__, static_folder="templates/static")
+app = Flask(__name__)
 # Set the secret key to some random bytes.
 app.secret_key = os.urandom(32)
 app.permanent_session_lifetime = datetime.timedelta(days=365)
@@ -22,7 +22,7 @@ app.permanent_session_lifetime = datetime.timedelta(days=365)
 """Load modules"""
 string_lib = StringLibrary(config.PATH_TO_STOPWORDS, config.TAGME_TOKEN, config.PATH_TO_TAGME_NER_CACHE)
 wikidata_search_cache = WikidataSearchCache(config.PATH_TO_WIKI_SEARCH_CACHE)
-kb = KnowledgeBase(config.PATH_TO_KB_LIST, config.PATH_TO_KB_DICTS, max_items=10)
+kb = KnowledgeBase(config.PATH_TO_KB_LIST, config.PATH_TO_KB_DICTS)
 
 """Initialize CLOCQ"""
 method_name = "clocq_server"

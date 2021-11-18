@@ -12,10 +12,10 @@ Beyond NED: Fast and Effective Search Space Reduction for   Complex Question Ans
 - [License](#license)
 
 # Description
-This repository contains the code and data for our [WSDM 2022 paper](https://arxiv.org/abs/2108.08597#) on search space reduction for KB-QA. In this work, we present a novel KB index for efficient access to QA-relevant KB functionalities. Leveraging this KB index, we establish a top-k processing framework to disambiguate question words based on four relevance scores, named **CLOCQ**. CLOCQ makes use of global signals (connectivity in KB-graph, semantic coherence), and local signals (question relatedness, term-matching) to detect top-k KB items for each question word. KB facts involving the disambiguated items are retrieved and constitute the search space.
+This repository contains the code and data for our [WSDM 2022 paper](https://arxiv.org/abs/2108.08597#) on search space reduction for KB-QA. In this work, we present a novel KB-index for efficient access to QA-relevant KB functionalities. Leveraging this KB-index, we establish a top-k processing framework, named **CLOCQ**, to disambiguate question words based on four relevance scores. CLOCQ makes use of global signals (connectivity in KB-graph, semantic coherence), and local signals (question relatedness, term-matching) to detect top-k KB-items for each question word. KB-facts involving the disambiguated items are retrieved and constitute the search space.
 
 Since some question words might be more ambiguous than others, we propose a mechanism to automatically set an appropriate k for each question word individually.
-Further, highly frequent KB items like US might occur in millions of KB facts. To this end, we propose a mechanism based on a pruning threshold p to keep only salient facts in the search space.
+Further, highly frequent KB-items like US might occur in millions of KB-facts. To this end, we propose a mechanism based on a pruning threshold p to keep only salient facts in the search space.
 
 For more details, please refer to [the paper](https://arxiv.org/abs/2108.08597#) (will be published at [WSDM 2022](https://www.wsdm-conference.org/2022/)).  
 There is also a website available: [https://clocq.mpi-inf.mpg.de](https://clocq.mpi-inf.mpg.de).
@@ -34,7 +34,7 @@ If you use this code, please cite:
 
 ## System requirements
 All code was tested on Linux only.  
-Note, that the CLOCQ KB index requires ca. 370 GB of memory (RAM) to be loaded.
+Note, that the CLOCQ KB-index requires ca. 370 GB of memory (RAM) to be loaded.
 While loading the KB, the indexes are established, which takes roughly 2 hours.
 It is therefore recommended to run all processes in the background (e.g. using nohup).  
 
@@ -102,7 +102,7 @@ Additional logs can be found in 'results/clocq_test_clocq.txt'.
 The CLOCQ KB makes use of the [wikidata-core-for-QA](https://github.com/PhilippChr/wikidata-core-for-QA) repo, which was a joint effort with [Magdalena Kaiser](https://people.mpi-inf.mpg.de/~mkaiser/) to prune irrelevant facts from Wikidata.
 So given the latest .nt dump from Wikidata, the dump first needs to be pre-processed as indicated in the repo.  
   
-After that, the CLOCQ KB index can be applied.
+After that, the CLOCQ KB-index can be applied.
 This is done using the [csv_to_clocq script](clocq/knowledge_base/creation/csv_to_clocq.sh).
 
 

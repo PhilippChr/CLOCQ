@@ -15,9 +15,12 @@ from clocq.WikidataSearchCache import WikidataSearchCache
 
 
 class CLOCQ:
-    def __init__(self, dev=False):
+    def __init__(self, tagme_token=None, dev=False):
         # load required modules
-        string_lib = StringLibrary(config.PATH_TO_STOPWORDS, config.TAGME_TOKEN, config.PATH_TO_TAGME_NER_CACHE)
+        if tagme_token:
+            string_lib = StringLibrary(config.PATH_TO_STOPWORDS, tagme_token, config.PATH_TO_TAGME_NER_CACHE)
+        else:
+            string_lib = StringLibrary(config.PATH_TO_STOPWORDS, config.TAGME_TOKEN, config.PATH_TO_TAGME_NER_CACHE)
         wikidata_search_cache = WikidataSearchCache(config.PATH_TO_WIKI_SEARCH_CACHE)
         if dev:
             self.kb = KnowledgeBase(config.PATH_TO_KB_LIST, config.PATH_TO_KB_DICTS, max_items=10)
