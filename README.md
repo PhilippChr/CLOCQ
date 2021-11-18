@@ -76,7 +76,27 @@ The new benchmark needs to be added to the 'BENCHMARKS' parameter in the [config
 ## Using CLOCQ
 There are different possible setups for using CLOCQ within your project.
 1. **Static usage of CLOCQ**:  
-You can pass a benchmark in [this format](benchmarks/benchmark_format.md) to the [Inference.py](clocq/Inference.py) script. The results (search space and disambiguations) for each question are stored in a .json file.
+You can add a new benchmark tuple to the [config](clocq/config.py), and run the [Inference.py](clocq/Inference.py) script. The benchmark should be stored in [this format](benchmarks/benchmark_format.md). The results (search space and disambiguations) for each question are stored in a .json file.
+
+```python
+    # Add benchmark to clocq/config.py
+    # ...
+    BENCHMARKS = [
+        ("benchmarks/benchmark_format.json", "benchmark_name")
+    ]
+    # ...
+```
+
+```bash
+    # Evaluate + store results (on test set)
+    nohup python clocq/Inference.py --test --store &
+```
+
+```bash
+    # Evaluate + store results (on dev set)
+    nohup python clocq/Inference.py --dev --store &
+```
+
 
 2. **Dynamic usage of CLOCQ - within a single script**:  
 If your data is dynamic (e.g. in a realistic setup in which users can pose arbitrary questions at run-time), there is another possibility of using CLOCQ:
