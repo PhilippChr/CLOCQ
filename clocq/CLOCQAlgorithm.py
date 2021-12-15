@@ -151,7 +151,7 @@ class CLOCQAlgorithm:
         search_space = list()
         for j, topk_processor in enumerate(topk_processors):
             topklist = topk_processor.get_top_k()
-            p = self._set_p(p_setting)  # set value of p
+            p = self._set_p(p_setting, topk_processor.k)  # set value of p
             for rank, item in enumerate(topklist):
                 label = self.kb.item_to_single_label(item["id"])
                 kb_item_tuple.append(
@@ -189,22 +189,22 @@ class CLOCQAlgorithm:
         if self.verbose:
             print(string)
 
-    def _set_p(self, p_setting):
+    def _set_p(self, p_setting, k):
         """Set the value of p for the given p_setting."""
         if p_setting == "DYNAMIC1":
-            p_value = 10 ** (6 - nested_processor.k)
+            p_value = 10 ** (6 - k)
         elif p_setting == "DYNAMIC2":
-            p_value = 10 ** (5 - nested_processor.k)
+            p_value = 10 ** (5 - k)
         elif p_setting == "DYNAMIC3":
-            p_value = 10 ** (5 - 0.5 * nested_processor.k)
+            p_value = 10 ** (5 - 0.5 * k)
         elif p_setting == "DYNAMIC4":
-            p_value = 10 ** (4 - 0.5 * nested_processor.k)
+            p_value = 10 ** (4 - 0.5 * k)
         elif p_setting == "DYNAMIC5":
-            p_value = 10 ** (nested_processor.k)
+            p_value = 10 ** (k)
         elif p_setting == "DYNAMIC6":
-            if nested_processor.k == 1:
+            if k == 1:
                 p_value = 10000
-            elif nested_processor.k < 4:
+            elif k < 4:
                 p_value = 1000
             else:
                 p_value = 100

@@ -167,15 +167,15 @@ class KnowledgeBase:
     def item_to_types(self, item):
         """Retrieve Wikidata types for Wikidata ID."""
         if item is None:
-            return None
+            return []
         # get integer encoding
         integer_encoded_item = self._item_to_integer(item)
         if not integer_encoded_item:
-            return None
+            return []
         # call efficient function
         types = self._integer_to_types(integer_encoded_item)
         if not types:
-            return ["None"]
+            return []
         return types
 
     def _integer_to_types(self, integer_encoded_item):
