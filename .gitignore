@@ -7,3 +7,7 @@ knowledge_base/KnowledgeBaseLowMem.py
 *.kb
 clocq.egg-info/
 data/
+dist/
+build/
+CLOCQ_API.md
+scripts
