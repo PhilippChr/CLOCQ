@@ -316,11 +316,11 @@ class KnowledgeBase:
         if len1 > len2:
             for fact in neighbors2:
                 if integer_encoded_item1 in fact:
-                    connections.append(self.decode_integer_encoded_fact(fact))
+                    connections.append(self._decode_integer_encoded_fact(fact))
         else:
             for fact in neighbors1:
                 if integer_encoded_item2 in fact:
-                    connections.append(self.decode_integer_encoded_fact(fact))
+                    connections.append(self._decode_integer_encoded_fact(fact))
         return connections
 
     def _integer_find_connections_2_hop(self, integer_encoded_item1, integer_encoded_item2):
