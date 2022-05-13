@@ -4,9 +4,15 @@ The server can be used on the local machine (localhost), or within a virtual hos
 Starting the server will take 2 hours roughly, for loading the KB.
 
 ### Starting the server
+
+You can try the server using the following command:
 ```bash
 	nohup python clocq/interface/CLOCQInterfaceServer.py > clocq/interface/SERVER.out &
 ```
+
+
+However, it is recommended to bring the server into production, when using it regularly.
+This can be done e.g. using [gunicorn](https://gunicorn.org).
 
 ## Client
 After the server has started, one can create clients to interact with CLOCQ.

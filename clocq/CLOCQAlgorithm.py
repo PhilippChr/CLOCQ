@@ -233,7 +233,7 @@ class CLOCQAlgorithm:
         A maximum of 'bm25_limit' facts are returned.
         """
         if len(search_space) > bm25_limit:
-            fact_tuples = [(fact, self._verbalize_kb_fact(fact)) for fact in context_graph]
+            fact_tuples = [(fact, self._verbalize_kb_fact(fact)) for fact in search_space]
             search_space = self._bm25_retrieve_top_facts(question, fact_tuples, bm25_limit)
         return search_space
 
@@ -241,11 +241,11 @@ class CLOCQAlgorithm:
         """
         Return the 'bm25_limit' facts using the verbalized collection.
         """
-        corpus_tok = [self._tokenize(fact_tuple[1]) for fact_tuple in fact_tuples]
+        tokenized_corpus = [self._tokenize(fact_tuple[1]) for fact_tuple in fact_tuples]
         mapping = {" ".join(self._tokenize(fact_tuple[1])): fact_tuple[0] for fact_tuple in fact_tuples}
         bm25 = BM25Okapi(tokenized_corpus)
         question_tok = self._tokenize(question)
-        res = bm25.get_top_n(question_tok, corpus_tok, n=bm25_limit)
+        res = bm25.get_top_n(question_tok, tokenized_corpus, n=bm25_limit)
         # map from texts -> KB facts
         top_facts = list()
         for result in res:
@@ -266,6 +266,7 @@ class CLOCQAlgorithm:
     def _tokenize(self, string):
         """Tokenize input string."""
         string = string.replace(",", "")
+        # string = string.lower()
         return [word for word in string.split() if not word in self.stopwords]
 
 
