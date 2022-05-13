@@ -22,11 +22,12 @@ There is also a website available: [https://clocq.mpi-inf.mpg.de](https://clocq.
 
 If you use this code, please cite:
 ```bibtex
-@article{christmann2021beyond,
+@inproceedings{christmann2022beyond,
   title={Beyond NED: Fast and Effective Search Space Reduction for Complex Question Answering over Knowledge Bases},
-  author={Christmann, Philipp and Roy, Rishiraj Saha and Weikum, Gerhard},
-  journal={arXiv preprint arXiv:2108.08597},
-  year={2021}
+  author={Christmann, Philipp and Saha Roy, Rishiraj and Weikum, Gerhard},
+  booktitle={Proceedings of the Fifteenth ACM International Conference on Web Search and Data Mining},
+  pages={172--180},
+  year={2022}
 }
 ```
 
