@@ -164,7 +164,10 @@ class CLOCQInterfaceClient:
         return self.PRED_PATTERN.match(string) is not None
 
     def _req(self, action, json):
-        return self.req.post(self.host + ":" + self.port + action, json=json)
+        if self.port == "443":
+            return self.req.post(self.host + action, json=json)
+        else:
+            return self.req.post(self.host + ":" + self.port + action, json=json)
 
 
 """
