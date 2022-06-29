@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import copy
 import sys
 import time
 
@@ -169,9 +170,9 @@ def search_space():
     # load parameters
     parameters = json_dict.get("parameters")
     if parameters is None:
-        parameters = config.DEF_PARAMS
+        parameters = copy.deepcopy(config.DEF_PARAMS)
     else:
-        new_parameters = config.DEF_PARAMS
+        new_parameters = copy.deepcopy(config.DEF_PARAMS)
         for key in parameters:
             new_parameters[key] = parameters[key]
         parameters = new_parameters
