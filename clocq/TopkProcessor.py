@@ -68,6 +68,8 @@ class TopkProcessor:
         # set k automatically for question word
         if k == "AUTO":
             self.k = self._set_k()
+        else:
+            self.k = int(k)
 
     def _initialize_item_retrieval(self, depth, wikidata_search_cache):
         """

@@ -176,6 +176,13 @@ def search_space():
         for key in parameters:
             new_parameters[key] = parameters[key]
         parameters = new_parameters
+    # load p and k (potentially)
+    if "p" in json_dict:
+        parameters["p_setting"] = json_dict["p"]
+    if "p_setting" in json_dict:
+        parameters["p_setting"] = json_dict["p_setting"]
+    if "k" in json_dict:
+        parameters["k"] = json_dict["k"]
     # include labels of search space?
     include_labels = json_dict.get("include_labels")
     if include_labels is None:

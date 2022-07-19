@@ -54,7 +54,7 @@ class CLOCQAlgorithm:
         h_rel = parameters["h_rel"]
         h_conn = parameters["h_conn"]
         h_coh = parameters["h_coh"]
-        d = parameters["d"]
+        d = int(parameters["d"])
         k = parameters["k"]
         p_setting = parameters["p_setting"]
         bm25_limit = parameters["bm25_limit"]
@@ -209,7 +209,7 @@ class CLOCQAlgorithm:
             else:
                 p_value = 100
         else:
-            p_value = p_setting
+            p_value = int(p_setting)
         return p_value
 
     def _get_question_word_pairs(self, question_words):
