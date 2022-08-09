@@ -73,10 +73,22 @@ class CLOCQInterfaceClient:
         """
         Retrieves the types for the given KB item.
         Returns list of items with keys: {"id", "label"}.
-        E.g. {"id": "Q6979593", "label": "national association football team"} for "Q47774".
+        E.g. [{"id": "Q6979593", "label": "national association football team"}] for "Q47774".
         """
         params = {"item": kb_item}
         res = self._req("/item_to_types", params)
+        json_string = res.content.decode("utf-8")
+        types = json.loads(json_string)
+        return types
+
+    def get_type(self, kb_item):
+        """
+        Retrieves the  most frequent type for the given KB item.
+        Returns one item with keys: {"id", "label"}.
+        E.g. {"id": "Q6979593", "label": "national association football team"} for "Q47774".
+        """
+        params = {"item": kb_item}
+        res = self._req("/item_to_type", params)
         json_string = res.content.decode("utf-8")
         types = json.loads(json_string)
         return types
@@ -93,23 +105,23 @@ class CLOCQInterfaceClient:
         frequencies = json.loads(json_string)
         return frequencies
 
-    def get_neighborhood(self, kb_item, p=1000, include_labels=True):
+    def get_neighborhood(self, kb_item, p=1000, include_labels=True, include_type=False):
         """
         Returns a list of facts including the item (the 1-hop neighborhood)
         each fact is a n-tuple, with subject, predicate, object and qualifier information.
         """
-        params = {"item": kb_item, "p": p, "include_labels": include_labels}
+        params = {"item": kb_item, "p": p, "include_labels": include_labels, "include_type": include_type}
         res = self._req("/neighborhood", params)
         json_string = res.content.decode("utf-8")
         neighbors = json.loads(json_string)
         return neighbors
 
-    def get_neighborhood_two_hop(self, kb_item, p=1000, include_labels=True):
+    def get_neighborhood_two_hop(self, kb_item, p=1000, include_labels=True, include_type=False):
         """
         Returns a list of facts in the 2-hop neighborhood of the item
         each fact is a n-tuple, with subject, predicate, object and qualifier information.
         """
-        params = {"item": kb_item, "p": p, "include_labels": include_labels}
+        params = {"item": kb_item, "p": p, "include_labels": include_labels, "include_type": include_type}
         res = self._req("/two_hop_neighborhood", params)
         json_string = res.content.decode("utf-8")
         neighbors = json.loads(json_string)
@@ -138,14 +150,14 @@ class CLOCQInterfaceClient:
         connectivity = float(res.content)
         return connectivity
 
-    def get_search_space(self, question, parameters=dict(), include_labels=True):
+    def get_search_space(self, question, parameters=dict(), include_labels=True, include_type=False):
         """
         Extract a question-specific context for the given question using the CLOCQ algorithm.
         Returns k (context tuple, context graph)-pairs for the given questions,
         i.e. a mapping of question words to KB items and a question-relevant KG subset.
         In case the dict is empty, the default CLOCQ parameters are used
         """
-        params = {"question": question, "parameters": parameters, "include_labels": include_labels}
+        params = {"question": question, "parameters": parameters, "include_labels": include_labels, "include_type": include_type}
         res = self._req("/search_space", params)
         json_string = res.content.decode("utf-8")
         result = json.loads(json_string)

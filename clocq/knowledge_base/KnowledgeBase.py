@@ -13,6 +13,8 @@ class KnowledgeBase:
         # define regular expressions
         self.ENT_PATTERN = re.compile("^Q[0-9]+$")
         self.PRE_PATTERN = re.compile("^P[0-9]+$")
+        self.TIMESTAMP_PATTERN = re.compile('^"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T00:00:00Z"')
+
         # load data
         try:
             with open(path_to_kb_dicts + "/HIGHEST_ID.txt", "r") as fp:
@@ -54,7 +56,6 @@ class KnowledgeBase:
         # initialize runtime cache for connectivity
         self.connectivity_cache = dict()
 
-
     def _is_entity(self, integer_encoded_item):
         """Return whether encoded item is entity."""
         return integer_encoded_item >= 10000
@@ -66,6 +67,45 @@ class KnowledgeBase:
     def _is_literal(self, integer_encoded_item):
         """Return whether encoded item is literal."""
         return integer_encoded_item < 0
+
+    def _is_timestamp(self, item):
+        """Return whether item is timestamp."""
+        if self.TIMESTAMP_PATTERN.match(item.strip()):
+            return True
+        return False
+
+    def _convert_timestamp_to_date(self, timestamp):
+        """Convert the given timestamp to the corresponding date."""
+        adate = timestamp.split("-")
+        # parse data
+        year = adate[0]
+        month = self._convert_number_to_month(adate[1])
+        day = adate[2].split("T")[0]
+        # remove leading zero
+        if day[0] == "0":
+            day = day[1]
+        if day == "1" and adate[1] == "01":
+            # return year for 1st jan
+            return year
+        date = f"{day} {month} {year}"
+        return date
+
+    def _convert_number_to_month(self, number):
+        """Map the given month to a number."""
+        return {
+            "01": "January",
+            "02": "February",
+            "03": "March",
+            "04": "April",
+            "05": "May",
+            "06": "June",
+            "07": "July",
+            "08": "August",
+            "09": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December",
+        }[number]
 
     def _item_to_integer(self, item):
         """Encode the KB-item."""
@@ -100,6 +140,8 @@ class KnowledgeBase:
             return [str(item)]
         # literals can be returned directly
         if self._is_literal(integer_encoded_item):
+            if self._is_timestamp(item):
+                return [self._convert_timestamp_to_date(item)]
             return [str(item)]
         # call efficient function
         labels = self._integer_to_labels(integer_encoded_item)
@@ -163,6 +205,19 @@ class KnowledgeBase:
             return None
         description = self.descriptions_list[integer_encoded_item]
         return description
+
+    def item_to_most_frequent_type(self, item):
+        """Retrieve the most frequent Wikidata type for Wikidata ID."""
+        types = self.item_to_types(item)
+        highest_type_relevance = 0
+        most_frequent_type = None
+        for t in types:
+            freq1, freq2 = self.get_frequency(t["id"])
+            type_freq = freq1 + freq2
+            if type_freq > highest_type_relevance:
+                highest_type_relevance = type_freq
+                most_frequent_type = t
+        return most_frequent_type
 
     def item_to_types(self, item):
         """Retrieve Wikidata types for Wikidata ID."""
@@ -341,7 +396,7 @@ class KnowledgeBase:
             connections.append(connection)
         return connections
 
-    def extract_search_space(self, kb_item_tuple, p=1000, include_labels=False):
+    def extract_search_space(self, kb_item_tuple, p=1000, include_labels=False, include_type=False):
         """Extract the search space for the given KB-item tuple."""
         search_space = list()
         # retrieve neighborhood for each item
@@ -355,9 +410,11 @@ class KnowledgeBase:
         # include labels for more efficient access
         if include_labels:
             search_space = [self._add_labels_to_fact(fact) for fact in search_space]
+        if include_labels and include_type:
+            search_space = [self._add_type_to_fact(fact) for fact in search_space]
         return search_space
 
-    def extract_connected_search_space(self, kb_item_tuple, p=1000, include_labels=False):
+    def extract_connected_search_space(self, kb_item_tuple, p=1000, include_labels=False, include_type=False):
         """Extract a connected search space for the given KB-item tuple."""
         search_space = list()
         for item in kb_item_tuple:
@@ -373,9 +430,13 @@ class KnowledgeBase:
             intersection = set(fact) & set(kb_item_tuple)
             if len(intersection) > 1:
                 filtered_facts.append(fact)
+        if include_labels:
+            filtered_facts = [self._add_labels_to_fact(fact) for fact in filtered_facts]
+        if include_labels and include_type:
+            filtered_facts = [self._add_type_to_fact(fact) for fact in filtered_facts]
         return filtered_facts
 
-    def get_neighborhood(self, item, p=1000, include_labels=False):
+    def get_neighborhood(self, item, p=1000, include_labels=False, include_type=False):
         """Retrieve 1-hop KB neighborhood of the KB-item."""
         if item is None:
             return list()
@@ -386,9 +447,11 @@ class KnowledgeBase:
         # used for API
         if include_labels:
             neighborhood = [self._add_labels_to_fact(fact) for fact in neighborhood]
+        if include_labels and include_type:
+            neighborhood = [self._add_type_to_fact(fact) for fact in neighborhood]
         return neighborhood
 
-    def get_neighborhood_two_hop(self, item, p=1000, include_labels=False):
+    def get_neighborhood_two_hop(self, item, p=1000, include_labels=False, include_type=False):
         """Retrieve 2-hop KB neighborhood of the KB-item."""
         one_hop = self.get_neighborhood(item, p=p, include_labels=include_labels)
         # remember items seen
@@ -403,7 +466,7 @@ class KnowledgeBase:
                         next_hop_items.append(item_id)
         # get the two hop facts
         for item_id in next_hop_items:
-            facts = self.get_neighborhood(item_id, p=p, include_labels=include_labels)
+            facts = self.get_neighborhood(item_id, p=p, include_labels=include_labels, include_type=include_type)
             new_facts = list()
             # remove duplicates (facts with item)
             for fact in facts:
@@ -454,6 +517,12 @@ class KnowledgeBase:
     def _add_labels_to_fact(self, fact):
         """Retrieve labels for each element in the fact and add."""
         return [{"id": item, "label": self.item_to_single_label(item)} for item in fact]
+
+    def _add_type_to_fact(self, fact):
+        """Retrieve labels for each element in the fact and add."""
+        for item in fact:
+            item["type"] = self.item_to_most_frequent_type(item["id"])
+        return fact
 
     def _load_KB_index_from_file(self, file_path, max_items):
         """Load the KB indexes (= Wikidata KB) from file."""

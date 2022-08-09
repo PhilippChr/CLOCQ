@@ -51,13 +51,18 @@ def neighborhood():
     item_id = json_dict.get("item")
     if item_id is None:
         return jsonify([])
+    # include labels of neighborhood?
     include_labels = json_dict.get("include_labels")
     if include_labels is None:
         include_labels = True
+    # include most freq type for each item in neighborhood?
+    include_type = json_dict.get("include_type")
+    if include_type is None:
+        include_type = False
     p = json_dict.get("p")
     if p is None:
         p = 1000
-    facts = kb.get_neighborhood(item_id, p=p, include_labels=include_labels)
+    facts = kb.get_neighborhood(item_id, p=p, include_labels=include_labels, include_type=include_type)
     if not facts:
         facts = []
     return jsonify(facts)
@@ -69,13 +74,18 @@ def two_hop_neighborhood():
     item_id = json_dict.get("item")
     if item_id is None:
         return jsonify([])
+    # include labels of neighborhood?
     include_labels = json_dict.get("include_labels")
     if include_labels is None:
         include_labels = True
+    # include most freq type for each item in neighborhood?
+    include_type = json_dict.get("include_type")
+    if include_type is None:
+        include_type = False
     p = json_dict.get("p")
     if p is None:
         p = 1000
-    facts = kb.get_neighborhood_two_hop(item_id, p=p, include_labels=include_labels)
+    facts = kb.get_neighborhood_two_hop(item_id, p=p, include_labels=include_labels, include_type=include_type)
     if not facts:
         facts = []
     return jsonify(facts)
@@ -113,6 +123,15 @@ def item_to_types():
     if item is None:
         return jsonify(None)
     return jsonify(kb.item_to_types(item))
+
+    
+@app.route("/item_to_type", methods=["POST"])
+def item_to_type():
+    json_dict = request.json
+    item = json_dict.get("item")
+    if item is None:
+        return jsonify(None)
+    return jsonify(kb.item_to_most_frequent_type(item))
 
 
 @app.route("/item_to_label", methods=["POST"])
@@ -187,8 +206,12 @@ def search_space():
     include_labels = json_dict.get("include_labels")
     if include_labels is None:
         include_labels = True
+    # include most freq type for each item in search space?
+    include_type = json_dict.get("include_type")
+    if include_type is None:
+        include_type = False
     # compute result (search space and disambiguation results)
-    result = clocq.get_seach_space(question, parameters=parameters, include_labels=include_labels)
+    result = clocq.get_seach_space(question, parameters=parameters, include_labels=include_labels, include_type=include_type)
     return jsonify(result)
 
 
