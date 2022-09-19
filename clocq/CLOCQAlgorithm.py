@@ -48,7 +48,7 @@ class CLOCQAlgorithm:
         with open(path_to_stopwords, "r") as file:
             self.stopwords = file.read().split("\n")
 
-    def get_seach_space(self, question, parameters, include_labels=True):
+    def get_seach_space(self, question, parameters, include_labels=True, include_type=False):
         """Load parameters."""
         h_match = parameters["h_match"]
         h_rel = parameters["h_rel"]
@@ -162,7 +162,7 @@ class CLOCQAlgorithm:
                         "rank": rank,
                     }
                 )
-                search_space += self.kb.get_neighborhood(item["id"], p=p, include_labels=include_labels)
+                search_space += self.kb.get_neighborhood(item["id"], p=p, include_labels=include_labels, include_type=include_type)
         self._print_verbose(("Time for retrieving search space", time.time() - start))
 
         """ OPTIONAL: prune search space using BM25 """

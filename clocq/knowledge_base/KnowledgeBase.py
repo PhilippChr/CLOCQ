@@ -212,7 +212,7 @@ class KnowledgeBase:
         highest_type_relevance = 0
         most_frequent_type = None
         for t in types:
-            freq1, freq2 = self.get_frequency(t["id"])
+            freq1, freq2 = self.frequency(t["id"])
             type_freq = freq1 + freq2
             if type_freq > highest_type_relevance:
                 highest_type_relevance = type_freq
@@ -534,6 +534,7 @@ class KnowledgeBase:
             # initialization
             fact_length = 0
             count = 0
+            fact_count = 0
             fact_items = list()
             fact_entities = list()
 
@@ -553,6 +554,7 @@ class KnowledgeBase:
 
                 elif (fact_length - 3) % 2 == 0 and self._is_entity(curr_item):
                     # new fact detected (two successive entities) -> store prev. fact
+                    fact_count += 1
                     for fact_item_index, fact_item in enumerate(fact_items):
                         if self._is_literal(fact_item):
                             continue
@@ -595,6 +597,7 @@ class KnowledgeBase:
                 if count == max_items:
                     break
         print(f"Successfully loaded KB index in {time.time() - start} seconds.")
+        print(f"{fact_count} KB-facts loaded.")
 
     def _print_verbose(self, string):
         """Print only if verbose is set."""
