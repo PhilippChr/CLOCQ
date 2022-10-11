@@ -185,7 +185,7 @@ class StringLibrary:
     def wikidata_url_to_wikidata_id(self, url):
         """Extract the Wikidata id from a Wikidata url."""
         if not url:
-            return False
+            return url
         if "XMLSchema#dateTime" in url or "XMLSchema#decimal" in url:
             date = url.split('"', 2)[1]
             date = date.replace("+", "")

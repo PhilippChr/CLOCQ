@@ -9,7 +9,7 @@ import time
 class KnowledgeBase:
     """This class encapsulates the logic of the efficient KB index as described in the CLOCQ paper (Christmann et al., WSDM 2022)."""
 
-    def __init__(self, path_to_kb_list, path_to_kb_dicts, max_items=None, verbose=False):
+    def __init__(self, path_to_kb_list, path_to_kb_dicts, max_items=None, verbose=False, index_neighbors=True, use_connectivity_cache=False):
         # define regular expressions
         self.ENT_PATTERN = re.compile("^Q[0-9]+$")
         self.PRE_PATTERN = re.compile("^P[0-9]+$")
@@ -45,6 +45,8 @@ class KnowledgeBase:
             )
         # remember settings
         self.verbose = verbose
+        self.index_neighbors = index_neighbors
+        self.use_connectivity_cache = use_connectivity_cache
         # initialize neighbor indices
         self.neighboring_facts_index = list()
         self.neighboring_items_index = list()
@@ -212,7 +214,7 @@ class KnowledgeBase:
         highest_type_relevance = 0
         most_frequent_type = None
         for t in types:
-            freq1, freq2 = self.frequency(t["id"])
+            freq1, freq2 = self.get_frequency(t["id"])
             type_freq = freq1 + freq2
             if type_freq > highest_type_relevance:
                 highest_type_relevance = type_freq
@@ -259,7 +261,7 @@ class KnowledgeBase:
                 types.append({"id": o, "label": o_label})
         return types
 
-    def frequency(self, item):
+    def get_frequency(self, item):
         """
         Returns frequency of KB-item in Wikidata.
         Returns: [frequency as subject, frequency as (qualifier-)object]"""
@@ -296,10 +298,11 @@ class KnowledgeBase:
         if not item1 or not item2:
             return 0
         # check cache
-        if self.connectivity_cache.get((item1, item2)):
-            return self.connectivity_cache.get((item1, item2))
-        elif self.connectivity_cache.get((item2, item1)):
-            return self.connectivity_cache.get((item2, item1))
+        if self.use_connectivity_cache:
+            if self.connectivity_cache.get((item1, item2)):
+                return self.connectivity_cache.get((item1, item2))
+            elif self.connectivity_cache.get((item2, item1)):
+                return self.connectivity_cache.get((item2, item1))
         # no hit in cache, compute!
         integer_encoded_item1 = self._item_to_integer(item1)
         integer_encoded_item2 = self._item_to_integer(item2)
@@ -307,32 +310,14 @@ class KnowledgeBase:
             return 0
         connectivity = self._connectivity_check_integers(integer_encoded_item1, integer_encoded_item2)
         # fill cache
-        self.connectivity_cache[(item1, item2)] = connectivity
+        if self.use_connectivity_cache:
+            self.connectivity_cache[(item1, item2)] = connectivity
         return connectivity
-
-    def _connectivity_check_integers_old(self, integer_encoded_item1, integer_encoded_item2):
-        """Check connectivity between the two encoded items. DEFAULT."""
-        neighbors1 = self.neighboring_items_index[integer_encoded_item1]
-        neighbors2 = self.neighboring_items_index[integer_encoded_item2]
-        if neighbors1 is None or neighbors2 is None:
-            return 0
-        len1 = len(neighbors1)
-        len2 = len(neighbors2)
-        if len1 > len2:
-            if integer_encoded_item1 in neighbors2:
-                return 1
-        else:
-            if integer_encoded_item2 in neighbors1:
-                return 1
-        if neighbors1 & neighbors2:
-            return 0.5
-        else:
-            return 0
 
     def _connectivity_check_integers(self, integer_encoded_item1, integer_encoded_item2):
         """Check connectivity between the two encoded items."""
-        neighbors1 = self.neighboring_items_index[integer_encoded_item1]
-        neighbors2 = self.neighboring_items_index[integer_encoded_item2]
+        neighbors1 = self._get_neighbors(integer_encoded_item1)
+        neighbors2 = self._get_neighbors(integer_encoded_item2)
         if neighbors1 is None or neighbors2 is None:
             return 0
         if integer_encoded_item1 in neighbors2 or integer_encoded_item2 in neighbors1:
@@ -342,7 +327,39 @@ class KnowledgeBase:
         else:
             return 0
 
-    def find_all_connections(self, item1, item2, hop=None):
+    def distance(self, item1, item2):
+        """Compute the distance between the two items."""
+        if not item1 or not item2:
+            return 0
+        integer_encoded_item1 = self._item_to_integer(item1)
+        integer_encoded_item2 = self._item_to_integer(item2)
+        if integer_encoded_item1 is None or integer_encoded_item2 is None:
+            return 0
+        # compute distance
+        return self._distance(integer_encoded_item1, integer_encoded_item2)
+
+    def _distance(self, integer_encoded_item1, integer_encoded_item2):
+        """Compute the distance between the two encoded items."""
+        neighbors1 = self._get_neighbors(integer_encoded_item1)
+        neighbors2 = self._get_neighbors(integer_encoded_item2)
+        if neighbors1 is None or neighbors2 is None:
+            return 0
+        if integer_encoded_item1 in neighbors2 or integer_encoded_item2 in neighbors1:
+            return 1
+        if neighbors1 & neighbors2:
+            return 2
+        # compute for >2 hops
+        if neighbors1 < neighbors2:
+            src_items = neighbors1
+            tgt_item = integer_encoded_item2
+        else:
+            src_items = neighbors2
+            tgt_item = integer_encoded_item1
+        # could definitely be optimized with smarter processing (e.g. using neighborhood size as processing cost)
+        distance = min([self._distance(src, tgt_item) for src in src_items]) + 1
+        return distance
+
+    def connect(self, item1, item2, hop=None):
         """Return a list of 1-hop paths or 2-hop paths between the items."""
         integer_encoded_item1 = self._item_to_integer(item1)
         integer_encoded_item2 = self._item_to_integer(item2)
@@ -357,23 +374,23 @@ class KnowledgeBase:
 
     def _integer_find_connections_1_hop(self, integer_encoded_item1, integer_encoded_item2):
         """Return a list of facts with item1 and item2."""
-        neighbors1 = (
+        neighborhood1 = (
             self.neighboring_facts_index[integer_encoded_item1]["s"]
             + self.neighboring_facts_index[integer_encoded_item1]["o"]
         )
-        neighbors2 = (
+        neighborhood2 = (
             self.neighboring_facts_index[integer_encoded_item2]["s"]
             + self.neighboring_facts_index[integer_encoded_item2]["o"]
         )
-        len1 = len(neighbors1)
-        len2 = len(neighbors2)
+        len1 = len(neighborhood1)
+        len2 = len(neighborhood2)
         connections = list()
         if len1 > len2:
-            for fact in neighbors2:
+            for fact in neighborhood2:
                 if integer_encoded_item1 in fact:
                     connections.append(self._decode_integer_encoded_fact(fact))
         else:
-            for fact in neighbors1:
+            for fact in neighborhood1:
                 if integer_encoded_item2 in fact:
                     connections.append(self._decode_integer_encoded_fact(fact))
         return connections
@@ -384,17 +401,31 @@ class KnowledgeBase:
         and a list of facts with item_between_item1_and_item2 and item2.
         """
         connections = list()
-        neighbors1 = self.neighboring_items_index[integer_encoded_item1]
-        neighbors2 = self.neighboring_items_index[integer_encoded_item2]
+        neighbors1 = self._get_neighbors(integer_encoded_item1)
+        neighbors2 = self._get_neighbors(integer_encoded_item2)
         items_in_the_middle = neighbors1 & neighbors2
         if not items_in_the_middle:
             return connections
         for item_in_the_middle in items_in_the_middle:
+            # skip extremely frequent items
+            if sum(self.get_frequency(item_in_the_middle)) > 100000:
+                continue
             connection1 = self._integer_find_connections_1_hop(integer_encoded_item1, item_in_the_middle)
             connection2 = self._integer_find_connections_1_hop(item_in_the_middle, integer_encoded_item2)
             connection = [connection1, connection2]
             connections.append(connection)
         return connections
+
+    def _get_neighbors(self, integer_encoded_item):
+        """Get the set of neighbors for the item."""
+        if self.index_neighbors:
+            return self.neighboring_items_index[integer_encoded_item]
+        else:
+            neighborhood = self.neighboring_facts_index[integer_encoded_item]
+            if neighborhood is None:
+                return set()
+            neighborhood = neighborhood["s"] + neighborhood["o"]
+            return set([item for fact in neighborhood for item in fact])
 
     def extract_search_space(self, kb_item_tuple, p=1000, include_labels=False, include_type=False):
         """Extract the search space for the given KB-item tuple."""
@@ -535,6 +566,7 @@ class KnowledgeBase:
             fact_length = 0
             count = 0
             fact_count = 0
+            qualifier_facts_count = 0
             fact_items = list()
             fact_entities = list()
 
@@ -555,6 +587,8 @@ class KnowledgeBase:
                 elif (fact_length - 3) % 2 == 0 and self._is_entity(curr_item):
                     # new fact detected (two successive entities) -> store prev. fact
                     fact_count += 1
+                    if len(fact_items) > 3:
+                        qualifier_facts_count += 1
                     for fact_item_index, fact_item in enumerate(fact_items):
                         if self._is_literal(fact_item):
                             continue
@@ -571,7 +605,8 @@ class KnowledgeBase:
                             else:
                                 # index facts the item occurs in as object or qualifier-object (o)
                                 self.neighboring_facts_index[fact_item]["o"].append(fact_items)
-                            self.neighboring_items_index[fact_item].update(fact_entities)
+                            if self.index_neighbors:
+                                self.neighboring_items_index[fact_item].update(fact_entities)
                         except:
                             raise Exception("Fail with ngb_index[fact_item]: " + str(fact_item))
 
@@ -598,6 +633,7 @@ class KnowledgeBase:
                     break
         print(f"Successfully loaded KB index in {time.time() - start} seconds.")
         print(f"{fact_count} KB-facts loaded.")
+        print(f"{qualifier_facts_count} KB-facts with qualifiers loaded.")
 
     def _print_verbose(self, string):
         """Print only if verbose is set."""
