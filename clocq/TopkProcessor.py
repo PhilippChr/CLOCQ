@@ -108,7 +108,7 @@ class TopkProcessor:
         frequencies = list()
         # determine frequencies
         for item in search_result:
-            freqs = self.kb.frequency(item)
+            freqs = self.kb.get_frequency(item)
             freq = sum(freqs)
             frequencies.append(freq)
         sum_frequency = sum(frequencies)
