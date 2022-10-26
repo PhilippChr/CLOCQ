@@ -216,14 +216,14 @@ class KnowledgeBaseSPARQL:
             query = f"""SELECT (COUNT(*) as ?count) WHERE {{
                             wd:{item} ?p ?o
                         }}"""
-            res = self.request_wikidata.get(self.sparql_endpoint + query)
+            res = self.request_wikidata.get(self.sparql_endpoint + query, headers=self.sparql_headers)
             count1 = int(_process_res(res))
 
             # entity as object/qualifier object
             query = f"""SELECT (COUNT(*) as ?count) WHERE {{
                             ?s ?p wd:{item}
                         }}"""
-            res = self.request_wikidata.get(self.sparql_endpoint + query)
+            res = self.request_wikidata.get(self.sparql_endpoint + query, headers=self.sparql_headers)
             count2 = int(_process_res(res))
             return [count1, count2]
         else:
@@ -231,14 +231,14 @@ class KnowledgeBaseSPARQL:
             query = f"""SELECT (COUNT(*) as ?count) WHERE {{
                             ?s wdt:{item} ?o
                         }}"""
-            res = self.request_wikidata.get(self.sparql_endpoint + query)
+            res = self.request_wikidata.get(self.sparql_endpoint + query, headers=self.sparql_headers)
             count1 = int(_process_res(res))
 
             # predicate as qualifier predicate
             query = f"""SELECT (COUNT(*) as ?count) WHERE {{
                             ?s p:{item} ?o
                         }}"""
-            res = self.request_wikidata.get(self.sparql_endpoint + query)
+            res = self.request_wikidata.get(self.sparql_endpoint + query, headers=self.sparql_headers)
             count2 = int(_process_res(res))
             return [0, count1+count2]
 
