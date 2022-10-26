@@ -9,6 +9,7 @@ Beyond NED: Fast and Effective Search Space Reduction for   Complex Question Ans
 	- [Using CLOCQ](#using-clocq)
 	- [Reproducing paper results](#reproducing-paper-results)
     - [Creation of CLOCQ KB](#creation-of-clocq-kb)
+- [CLOCQ for entity linking](#clocq-for-entity-linking)
 - [License](#license)
 
 # Description
@@ -138,6 +139,13 @@ So given the latest .nt dump from Wikidata, the dump first needs to be pre-proce
   
 After that, the CLOCQ KB-index can be applied.
 This is done using the [csv_to_clocq script](clocq/knowledge_base/creation/csv_to_clocq.sh).
+
+
+# CLOCQ for entity linking
+If you want to use CLOCQ for entity linking, you may find [our pruning module](https://github.com/PhilippChr/CLOCQ-pruning-module/blob/master/README.md) helpful.
+The original CLOCQ code is mainly designed for search space reduction, for which linking all mentions was found to be beneficial.
+However, on entity linking tasks, this may easily reduce the precision.
+Therefore, we proposed a module to prune disambiguated KB items, that are not required for entity linking, to adapt CLOCQ to the entity linking challenge of the [SMART 2022 Task](https://smart-task.github.io/2022/).
 
 
 # License

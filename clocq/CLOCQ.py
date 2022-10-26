@@ -88,9 +88,17 @@ class CLOCQ:
         """
         Retrieves the types for the given KB item.
         Returns list of items with keys: {"id", "label"}.
-        E.g. {"id": "Q6979593", "label": "national association football team"} for "Q47774".
+        E.g. [{"id": "Q6979593", "label": "national association football team"}] for "Q47774".
         """
         return self.kb.item_to_types(kb_item)
+
+    def get_type(self, kb_item):
+        """
+        Retrieves the most frequent type for the given KB item.
+        Returns a single item with keys: {"id", "label"}.
+        E.g. {"id": "Q6979593", "label": "national association football team"} for "Q47774".
+        """
+        return self.kb.item_to_most_frequent_type(kb_item)
 
     def get_frequency(self, kb_item):
         """
@@ -98,28 +106,28 @@ class CLOCQ:
         - number of facts with the item occuring as subject
         - number of facts with the item occuring as object/qualifier-object.
         """
-        return self.kb.frequency(kb_item)
+        return self.kb.get_frequency(kb_item)
 
-    def get_neighborhood(self, kb_item, p=1000, include_labels=True):
+    def get_neighborhood(self, kb_item, p=1000, include_labels=True, include_type=False):
         """
         Returns a list of facts including the item (the 1-hop neighborhood)
         each fact is a n-tuple, with subject, predicate, object and qualifier information.
         """
-        return self.kb.get_neighborhood(kb_item, p=p, include_labels=include_labels)
+        return self.kb.get_neighborhood(kb_item, p=p, include_labels=include_labels, include_type=include_type)
 
-    def get_neighborhood_two_hop(self, kb_item, p=1000, include_labels=True):
+    def get_neighborhood_two_hop(self, kb_item, p=1000, include_labels=True, include_type=False):
         """
         Returns a list of facts in the 2-hop neighborhood of the item
         each fact is a n-tuple, with subject, predicate, object and qualifier information.
         """
-        return self.kb.get_neighborhood_two_hop(kb_item, p=p, include_labels=include_labels)
+        return self.kb.get_neighborhood_two_hop(kb_item, p=p, include_labels=include_labels, include_type=include_type)
 
     def connect(self, kb_item1, kb_item2):
         """
         Returns a list of paths between item1 and item2. Each path is given by either 1 fact
         (1-hop connection) or 2 facts (2-hop connections).
         """
-        return self.kb.find_all_connections(kb_item1, kb_item2)
+        return self.kb.connect(kb_item1, kb_item2)
 
     def connectivity_check(self, kb_item1, kb_item2):
         """
@@ -130,7 +138,7 @@ class CLOCQ:
         """
         return self.kb.connectivity_check(kb_item1, kb_item2)
 
-    def get_search_space(self, question, parameters=dict(), include_labels=True):
+    def get_search_space(self, question, parameters=dict(), include_labels=True, include_type=False):
         """
         Extract a question-specific context for the given question using the CLOCQ algorithm.
         Returns k (context tuple, context graph)-pairs for the given questions,
@@ -144,7 +152,7 @@ class CLOCQ:
             for key in parameters:
                 new_parameters[key] = parameters[key]
             parameters = new_parameters
-        return self.clocq.get_seach_space(question, parameters=parameters, include_labels=include_labels)
+        return self.clocq.get_seach_space(question, parameters=parameters, include_labels=include_labels, include_type=include_type)
 
     def is_wikidata_entity(self, string):
         """
