@@ -92,7 +92,7 @@ def two_hop_neighborhood():
 
 
 @app.route("/connect", methods=["POST"])
-def find_all_connections():
+def connect():
     json_dict = request.json
     item1 = json_dict.get("item1")
     if item1 is None:
@@ -101,7 +101,7 @@ def find_all_connections():
     if item2 is None:
         return jsonify(None)
     hop = json_dict.get("hop")
-    return jsonify(kb.find_all_connections(item1, item2, hop=hop))
+    return jsonify(kb.connect(item1, item2, hop=hop))
 
 
 @app.route("/connectivity_check", methods=["POST"])
@@ -176,7 +176,7 @@ def frequency():
     item = json_dict.get("item")
     if item is None:
         return None
-    return jsonify(kb.frequency(item))
+    return jsonify(kb.get_frequency(item))
 
 
 @app.route("/search_space", methods=["POST"])
