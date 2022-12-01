@@ -1,0 +1,3 @@
+[submodule "CLOCQ-pruning-module"]
+	path = CLOCQ-pruning-module
+	url = git@github.com:PhilippChr/CLOCQ-pruning-module.git
