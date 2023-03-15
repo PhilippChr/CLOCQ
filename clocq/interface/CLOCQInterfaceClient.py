@@ -218,7 +218,7 @@ class CLOCQInterfaceClient:
 MAIN
 """
 if __name__ == "__main__":
-	clocq = CLOCQInterfaceClient(port="7778")
+	clocq = CLOCQInterfaceClient(host="https://clocq.mpi-inf.mpg.de/api", port="443")
 
 	kb_item = "Q5"
 	res = clocq.get_label(kb_item)
